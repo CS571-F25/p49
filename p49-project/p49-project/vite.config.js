@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-
 export default defineConfig({
-  base: '/p49/',
-  build: { outDir: '../docs' },
-  plugins: [react()]
+plugins: [react()],
+base: '/p0/',
+build: {
+outDir: 'docs'
+}
 })
