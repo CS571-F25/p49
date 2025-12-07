@@ -1,42 +1,138 @@
-#root {
-  max-width: 1280px;
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main content container */
+.app-main {
+  flex: 1;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 2.5rem 1.5rem 3rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* NAVBAR OVERRIDE */
+
+.cc-navbar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: #ffffff !important;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* HERO */
+
+.hero {
+  margin-top: 2rem;
+  margin-bottom: 2.5rem;
+  text-align: left;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #ffe5e3;
+  color: #8b1b13;
+  margin-bottom: 0.75rem;
 }
 
-.card {
-  padding: 2em;
+.hero-title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
-.read-the-docs {
-  color: #888;
+.hero-subtitle {
+  max-width: 38rem;
+  margin-top: 0.6rem;
+  color: #555555;
+  font-size: 1rem;
+}
+
+/* Craving selector */
+
+.craving-controls {
+  margin-top: 1.5rem;
+}
+
+.craving-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.craving-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Results card */
+
+.craving-results {
+  margin-top: 2.25rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 1.2rem;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+}
+
+.craving-heading {
+  font-size: 1.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.craving-tagline {
+  color: #555555;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.craving-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.craving-item {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid #ececec;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.craving-item:last-child {
+  border-bottom: none;
+}
+
+.craving-spot-name {
+  font-weight: 600;
+}
+
+/* EXPLORE GRID */
+
+.explore-header {
+  margin-bottom: 1.25rem;
+}
+
+.explore-header p {
+  color: #555555;
+}
+
+/* PROFILE */
+
+.profile-empty {
+  color: #555555;
+  font-size: 0.95rem;
+}
+
+/* FOOTER */
+
+footer {
+  background-color: #ffffff;
 }
