@@ -3,38 +3,43 @@ import { Form, Button } from "react-bootstrap";
 import { RESTAURANTS } from "../data/restaurants";
 import RestaurantCard from "./RestaurantCard";
 
-export default function Profile({ favoriteIds, onToggleFavorite }) {
-  const [profile, setProfile] = useState({
+export default function Profile({ savedCravingIds, onToggleCraving }) {
+  // Sets default blank values for users profile until profile is actually created
+  const [userProfile, setUserProfile] = useState({
     name: "",
     favoriteCuisine: "",
     budget: "",
     bio: "",
   });
-  const [hasSaved, setHasSaved] = useState(false);
+  const [hasSavedProfile, setHasSavedProfile] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("userProfile");
     if (stored) {
-      setProfile(JSON.parse(stored));
-      setHasSaved(true);
+      setUserProfile(JSON.parse(stored));
+      setHasSavedProfile(true);
     }
   }, []);
 
-  function handleChange(e) {
+  function handleFieldChange(e) {
     const { name, value } = e.target;
-    setProfile((prev) => ({
+    setUserProfile((prev) => ({
       ...prev,
       [name]: value,
     }));
   }
 
-  function handleSubmit(e) {
+  // Saves and updates profile once submitted
+  function handleProfileSubmit(e) {
     e.preventDefault();
-    localStorage.setItem("userProfile", JSON.stringify(profile));
-    setHasSaved(true);
+    localStorage.setItem("userProfile", JSON.stringify(userProfile));
+    setHasSavedProfile(true);
   }
 
-  const favorites = RESTAURANTS.filter((r) => favoriteIds.includes(r.id));
+  // Uses profile to filter through restaurants that match mood
+  const favoriteSpots = RESTAURANTS.filter((spot) =>
+    savedCravingIds.includes(spot.id)
+  );
 
   return (
     <div>
@@ -43,17 +48,17 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
       <section className="mb-4">
         <h2 className="h4">Create or update your profile</h2>
         <p className="text-muted">
-          Tell us a little about yourself so suggestions feel more personal.
+          Tell us a little about yourself so suggestions feel more personal!
         </p>
 
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleProfileSubmit}>
           <Form.Group className="mb-3" controlId="profile-name">
             <Form.Label>Name</Form.Label>
             <Form.Control
               type="text"
               name="name"
-              value={profile.name}
-              onChange={handleChange}
+              value={userProfile.name}
+              onChange={handleFieldChange}
               placeholder="Your name"
             />
           </Form.Group>
@@ -63,8 +68,8 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
             <Form.Control
               type="text"
               name="favoriteCuisine"
-              value={profile.favoriteCuisine}
-              onChange={handleChange}
+              value={userProfile.favoriteCuisine}
+              onChange={handleFieldChange}
               placeholder="For example Thai, pizza, coffee and pastries"
             />
           </Form.Group>
@@ -73,8 +78,8 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
             <Form.Label>Typical budget</Form.Label>
             <Form.Select
               name="budget"
-              value={profile.budget}
-              onChange={handleChange}
+              value={userProfile.budget}
+              onChange={handleFieldChange}
             >
               <option value="">Select an option</option>
               <option value="low">$ student save mode</option>
@@ -89,8 +94,8 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
               as="textarea"
               rows={3}
               name="bio"
-              value={profile.bio}
-              onChange={handleChange}
+              value={userProfile.bio}
+              onChange={handleFieldChange}
               placeholder="For example food focused student at UW Madison who loves late night snacks and study cafes"
             />
           </Form.Group>
@@ -99,25 +104,25 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
             Save profile
           </Button>
 
-          {hasSaved && (
+          {hasSavedProfile && (
             <span className="ms-2 text-success" aria-live="polite">
               Profile saved
             </span>
           )}
         </Form>
 
-        {hasSaved && (
+        {hasSavedProfile && (
           <div className="mt-3">
             <p>
               <strong>Quick summary</strong>{" "}
-              {profile.name && <>for {profile.name}</>}
+              {userProfile.name && <>for {userProfile.name}</>}
             </p>
             <ul>
-              {profile.favoriteCuisine && (
-                <li>Likes {profile.favoriteCuisine} spots.</li>
+              {userProfile.favoriteCuisine && (
+                <li>Likes {userProfile.favoriteCuisine} spots.</li>
               )}
-              {profile.budget && <li>Usual budget: {profile.budget}.</li>}
-              {profile.bio && <li>{profile.bio}</li>}
+              {userProfile.budget && <li>Usual budget: {userProfile.budget}.</li>}
+              {userProfile.bio && <li>{userProfile.bio}</li>}
             </ul>
           </div>
         )}
@@ -125,7 +130,7 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
 
       <section>
         <h2 className="h4">Your saved spots</h2>
-        {favorites.length === 0 ? (
+        {favoriteSpots.length === 0 ? (
           <p className="profile-empty">
             You have not saved any spots yet. Visit the Explore page to add
             places to your Cravings.
@@ -135,12 +140,12 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
             <p className="mb-3">
               These are the spots you added to your Campus Cravings list.
             </p>
-            {favorites.map((r) => (
-              <div className="mb-3" key={r.id}>
+            {favoriteSpots.map((spot) => (
+              <div className="mb-3" key={spot.id}>
                 <RestaurantCard
-                  restaurant={r}
-                  isFavorite={true}
-                  onToggle={() => onToggleFavorite(r.id)}
+                  restaurant={spot}
+                  isSaved={true}
+                  onToggleCraving={() => onToggleCraving(spot.id)}
                 />
               </div>
             ))}

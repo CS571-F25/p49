@@ -11,8 +11,9 @@ import NavbarMain from "./components/NavbarMain";
 import Footer from "./components/Footer";
 
 function App() {
-  // initialize from localStorage once
-  const [favoriteIds, setFavoriteIds] = useState(() => {
+  // Saves restaurants user added to cravings in an array; list of cravings are shown if
+  // there are some saved or nothing is shown if none are saved
+  const [savedCravingIds, setSavedCravingIds] = useState(() => {
     try {
       const stored = localStorage.getItem("favorites");
       return stored ? JSON.parse(stored) : [];
@@ -21,20 +22,19 @@ function App() {
     }
   });
 
-  function toggleFavorite(id) {
-    setFavoriteIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+  function handleToggleCraving(id) {
+    setSavedCravingIds((prev) =>
+      prev.includes(id) ? prev.filter((spotId) => spotId !== id) : [...prev, id]
     );
   }
 
-  // persist only when favorites actually change
+  // useEffect allows us to store the favorited restaurant
   useEffect(() => {
     try {
-      localStorage.setItem("favorites", JSON.stringify(favoriteIds));
+      localStorage.setItem("favorites", JSON.stringify(savedCravingIds));
     } catch {
-      // ignore storage errors in dev
     }
-  }, [favoriteIds]);
+  }, [savedCravingIds]);
 
   return (
     <HashRouter>
@@ -42,22 +42,21 @@ function App() {
         <NavbarMain />
         <main className="app-main">
           <Routes>
-           <Route
-  path="/"
-  element={
-    <Home
-      favoriteIds={favoriteIds}
-      onToggleFavorite={toggleFavorite}
-    />
-  }
-/>
-
+            <Route
+              path="/"
+              element={
+                <Home
+                  savedCravingIds={savedCravingIds}
+                  onToggleCraving={handleToggleCraving}
+                />
+              }
+            />
             <Route
               path="/explore"
               element={
                 <Explore
-                  favoriteIds={favoriteIds}
-                  onToggleFavorite={toggleFavorite}
+                  savedCravingIds={savedCravingIds}
+                  onToggleCraving={handleToggleCraving}
                 />
               }
             />
@@ -65,8 +64,8 @@ function App() {
               path="/profile"
               element={
                 <Profile
-                  favoriteIds={favoriteIds}
-                  onToggleFavorite={toggleFavorite}
+                  savedCravingIds={savedCravingIds}
+                  onToggleCraving={handleToggleCraving}
                 />
               }
             />
@@ -75,8 +74,8 @@ function App() {
               path="/mood"
               element={
                 <MoodQuiz
-                  favoriteIds={favoriteIds}
-                  onToggleFavorite={toggleFavorite}
+                  savedCravingIds={savedCravingIds}
+                  onToggleCraving={handleToggleCraving}
                 />
               }
             />

@@ -1,3 +1,9 @@
+body {
+  background: linear-gradient(180deg, #fff5f5 0%, #ffffff 45%, #fdf2ff 100%);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
 .app-root {
   min-height: 100vh;
   display: flex;
@@ -12,15 +18,13 @@
   padding: 2.5rem 1.5rem 3rem;
 }
 
-/* NAVBAR OVERRIDE */
-
+/* NAVBAR */
 .cc-navbar {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   background-color: #ffffff !important;
 }
 
 /* HERO */
-
 .hero {
   margin-top: 2rem;
   margin-bottom: 2.5rem;
@@ -44,17 +48,17 @@
   font-size: 2.4rem;
   font-weight: 700;
   letter-spacing: 0.03em;
+  color: #b91c1c;
 }
 
 .hero-subtitle {
   max-width: 38rem;
   margin-top: 0.6rem;
-  color: #555555;
+  color: #4b5563;
   font-size: 1rem;
 }
 
 /* Craving selector */
-
 .craving-controls {
   margin-top: 1.5rem;
 }
@@ -70,13 +74,12 @@
   gap: 0.5rem;
 }
 
-/* Results card */
-
+/* Filter Results card */
 .craving-results {
   margin-top: 2.25rem;
   padding: 1.5rem 1.75rem;
   border-radius: 1.2rem;
-  background: #ffffff;
+  background: #fff7f5;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
 }
 
@@ -99,7 +102,7 @@
 
 .craving-item {
   padding: 0.55rem 0;
-  border-bottom: 1px solid #ececec;
+  border-bottom: 1px solid #f3e0dc;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -110,12 +113,7 @@
   border-bottom: none;
 }
 
-.craving-spot-name {
-  font-weight: 600;
-}
-
-/* EXPLORE GRID */
-
+/* Explore page header */
 .explore-header {
   margin-bottom: 1.25rem;
 }
@@ -124,15 +122,26 @@
   color: #555555;
 }
 
-/* PROFILE */
-
+/* Profile */
 .profile-empty {
   color: #555555;
   font-size: 0.95rem;
 }
 
-/* FOOTER */
+/* Restaurant cards */
+.restaurant-card {
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+}
 
+.restaurant-card img {
+  height: 180px;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* FOOTER */
 footer {
   background-color: #ffffff;
 }

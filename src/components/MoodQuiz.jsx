@@ -3,8 +3,8 @@ import { Row, Col, Form, Button } from "react-bootstrap";
 import { RESTAURANTS } from "../data/restaurants";
 import RestaurantCard from "./RestaurantCard";
 
-// Map quiz moods to tags that already exist in RESTAURANTS
 const MOODS = {
+  // These are the four preset moods for users to choose from 
   cheap: {
     label: "Cheap and Fast",
     description: "Quick and budget friendly food.",
@@ -27,7 +27,7 @@ const MOODS = {
   },
 };
 
-// Map quiz food type answers to tag sets that already exist in RESTAURANTS
+// Different tags used to differentiate restaurants 
 const FOOD_TYPE_TAGS = {
   pizza: ["pizza"],
   asian: ["asian", "nepalese"],
@@ -36,46 +36,54 @@ const FOOD_TYPE_TAGS = {
   coffee: ["coffee"],
 };
 
-export default function MoodQuiz({ favoriteIds, onToggleFavorite }) {
-  const [hunger, setHunger] = useState("meal");
-  const [budget, setBudget] = useState("medium");
-  const [vibe, setVibe] = useState("friends");
-  const [foodType, setFoodType] = useState("");
-  const [resultKey, setResultKey] = useState(null);
+export default function MoodQuiz({ savedCravingIds, onToggleCraving }) {
+  // These are the default values for the mood quiz
+  const [hungerLevel, setHungerLevel] = useState("meal");
+  const [budgetLevel, setBudgetLevel] = useState("medium");
+  const [hangoutVibe, setHangoutVibe] = useState("friends");
+  const [cravingType, setCravingType] = useState("");
+  const [activeMoodKey, setActiveMoodKey] = useState(null);
 
-  function determineMood() {
-    if (vibe === "study") return "study";
-    if (hunger === "snack" && budget === "high") return "treat";
-    if (hunger === "very" && budget !== "high") return "late";
+  // Options for current mood of user
+  function figureOutMood() {
+    if (hangoutVibe === "study"){
+       return "study";
+    }
+    if (hungerLevel === "snack" && budgetLevel === "high"){ 
+      return "treat";
+    }
+    if (hungerLevel === "very" && budgetLevel !== "high"){ 
+      return "late";
+    }
     return "cheap";
   }
 
-  function handleSubmit(e) {
+  // Once quiz is submitted restaurants are filtered and suggestions are made
+  function handleQuizSubmit(e) {
     e.preventDefault();
-    const mood = determineMood();
-    setResultKey(mood);
+    const moodKey = figureOutMood();
+    setActiveMoodKey(moodKey);
   }
 
-  const result = resultKey ? MOODS[resultKey] : null;
+  const activeMood = activeMoodKey ? MOODS[activeMoodKey] : null;
 
   function matchesMood(restaurant) {
-    if (!result) return false;
-    return restaurant.tags.some((t) => result.tags.includes(t));
+    if (!activeMood) return false;
+    return restaurant.tags.some((t) => activeMood.tags.includes(t));
   }
 
   function matchesFoodType(restaurant) {
-    if (!foodType) return true; // any type is fine
-    const tagsToMatch = FOOD_TYPE_TAGS[foodType] || [];
+    if (!cravingType) return true;
+    const tagsToMatch = FOOD_TYPE_TAGS[cravingType] || [];
     if (tagsToMatch.length === 0) return true;
     return restaurant.tags.some((t) => tagsToMatch.includes(t));
   }
 
-  const recommended =
-    result &&
-    RESTAURANTS.filter((r) => matchesMood(r) && matchesFoodType(r)).slice(
-      0,
-      9
-    );
+  const recommendations =
+    activeMood &&
+    RESTAURANTS.filter(
+      (spot) => matchesMood(spot) && matchesFoodType(spot)
+    ).slice(0, 9);
 
   return (
     <div>
@@ -87,13 +95,12 @@ export default function MoodQuiz({ favoriteIds, onToggleFavorite }) {
         </p>
       </header>
 
-      <Form onSubmit={handleSubmit} className="mb-4">
-        {/* Hunger */}
+      <Form onSubmit={handleQuizSubmit} className="mb-4">
         <Form.Group className="mb-3" controlId="hunger-select">
           <Form.Label>How hungry are you</Form.Label>
           <Form.Select
-            value={hunger}
-            onChange={(e) => setHunger(e.target.value)}
+            value={hungerLevel}
+            onChange={(e) => setHungerLevel(e.target.value)}
           >
             <option value="snack">Just a snack</option>
             <option value="meal">Regular meal</option>
@@ -101,7 +108,6 @@ export default function MoodQuiz({ favoriteIds, onToggleFavorite }) {
           </Form.Select>
         </Form.Group>
 
-        {/* Budget */}
         <Form.Group className="mb-3">
           <Form.Label>Budget</Form.Label>
           <div>
@@ -111,8 +117,8 @@ export default function MoodQuiz({ favoriteIds, onToggleFavorite }) {
               name="budget"
               label="$"
               value="low"
-              checked={budget === "low"}
-              onChange={(e) => setBudget(e.target.value)}
+              checked={budgetLevel === "low"}
+              onChange={(e) => setBudgetLevel(e.target.value)}
             />
             <Form.Check
               inline
@@ -120,8 +126,8 @@ export default function MoodQuiz({ favoriteIds, onToggleFavorite }) {
               name="budget"
               label="$$"
               value="medium"
-              checked={budget === "medium"}
-              onChange={(e) => setBudget(e.target.value)}
+              checked={budgetLevel === "medium"}
+              onChange={(e) => setBudgetLevel(e.target.value)}
             />
             <Form.Check
               inline
@@ -129,18 +135,17 @@ export default function MoodQuiz({ favoriteIds, onToggleFavorite }) {
               name="budget"
               label="$$$"
               value="high"
-              checked={budget === "high"}
-              onChange={(e) => setBudget(e.target.value)}
+              checked={budgetLevel === "high"}
+              onChange={(e) => setBudgetLevel(e.target.value)}
             />
           </div>
         </Form.Group>
 
-        {/* Vibe */}
         <Form.Group className="mb-3" controlId="vibe-select">
           <Form.Label>Vibe</Form.Label>
           <Form.Select
-            value={vibe}
-            onChange={(e) => setVibe(e.target.value)}
+            value={hangoutVibe}
+            onChange={(e) => setHangoutVibe(e.target.value)}
           >
             <option value="solo">Solo and chill</option>
             <option value="study">Study focused</option>
@@ -148,12 +153,11 @@ export default function MoodQuiz({ favoriteIds, onToggleFavorite }) {
           </Form.Select>
         </Form.Group>
 
-        {/* Type of food */}
         <Form.Group className="mb-3" controlId="food-type">
           <Form.Label>What type of food are you craving</Form.Label>
           <Form.Select
-            value={foodType}
-            onChange={(e) => setFoodType(e.target.value)}
+            value={cravingType}
+            onChange={(e) => setCravingType(e.target.value)}
           >
             <option value="">Any type</option>
             <option value="pizza">Pizza</option>
@@ -169,24 +173,23 @@ export default function MoodQuiz({ favoriteIds, onToggleFavorite }) {
         </Button>
       </Form>
 
-      {/* Results */}
-      {result && (
+      {activeMood && (
         <section>
-          <h2 className="mb-1">{result.label}</h2>
-          <p className="mb-3">{result.description}</p>
+          <h2 className="mb-1">{activeMood.label}</h2>
+          <p className="mb-3">{activeMood.description}</p>
 
-          {recommended.length === 0 && (
+          {recommendations.length === 0 && (
             <p>No matches found. Try changing your answers.</p>
           )}
 
-          {recommended.length > 0 && (
+          {recommendations.length > 0 && (
             <Row xs={1} md={2} lg={3} className="g-4">
-              {recommended.map((r) => (
-                <Col key={r.id}>
+              {recommendations.map((spot) => (
+                <Col key={spot.id}>
                   <RestaurantCard
-                    restaurant={r}
-                    isFavorite={favoriteIds.includes(r.id)}
-                    onToggle={() => onToggleFavorite(r.id)}
+                    restaurant={spot}
+                    isSaved={savedCravingIds.includes(spot.id)}
+                    onToggleCraving={() => onToggleCraving(spot.id)}
                   />
                 </Col>
               ))}

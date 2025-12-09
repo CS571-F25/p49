@@ -4,67 +4,91 @@ import { RESTAURANTS } from "../data/restaurants";
 import RestaurantCard from "./RestaurantCard";
 import ExploreFilterBar from "./ExploreFilterBar";
 
-export default function Explore({ favoriteIds, onToggleFavorite }) {
-  const [filter, setFilter] = useState("all");
-  const [profile, setProfile] = useState(null);
+export default function Explore({ savedCravingIds, onToggleCraving }) {
+  // Created filter for mood thats default is all
+  const [moodFilter, setMoodFilter] = useState("all");
+  // On the explore page the default for the user profile is null until user makes a profile on 
+  // the profile page
+  const [userProfile, setUserProfile] = useState(null);
 
+  // Saves users profile once created
   useEffect(() => {
     const stored = localStorage.getItem("userProfile");
     if (stored) {
-      setProfile(JSON.parse(stored));
+      setUserProfile(JSON.parse(stored));
     }
   }, []);
 
-  const filtered = RESTAURANTS.filter((r) =>
-    filter === "lateNight" ? r.tags.includes("lateNight") : true
-  );
-
   function matchesProfile(restaurant) {
-    if (!profile) return false;
+    if (!userProfile) return false;
+
+    // Through favorite type of cuisine we can narrow down food choices for user
+    const favCuisine = userProfile.favoriteCuisine?.toLowerCase().trim();
+    // Through budger preference of low, med, or high we can guide user to budget friendly foods
+    const budgetPref = userProfile.budget;
 
     const cuisineMatch =
-      profile.favoriteCuisine &&
-      restaurant.cuisine &&
-      restaurant.cuisine
-        .toLowerCase()
-        .includes(profile.favoriteCuisine.toLowerCase());
+      favCuisine &&
+      ((restaurant.name?.toLowerCase().includes(favCuisine)) ||
+        restaurant.tags?.some((t) => t.toLowerCase().includes(favCuisine)));
 
     const budgetMatch =
-      profile.budget &&
-      ((profile.budget === "low" && restaurant.price === "$") ||
-        (profile.budget === "medium" && restaurant.price === "$$") ||
-        (profile.budget === "high" && restaurant.price === "$$$"));
+      budgetPref &&
+      ((budgetPref === "low" && restaurant.price === "$") ||
+        (budgetPref === "medium" && restaurant.price === "$$") ||
+        (budgetPref === "high" && restaurant.price === "$$$"));
 
-    return cuisineMatch || budgetMatch;
+    return !!(cuisineMatch || budgetMatch);
   }
+
+  const filteredRestaurants = RESTAURANTS.filter((spot) => {
+    // Matches the users budget preference to the cheap tag
+    if (moodFilter === "cheap") {
+      return spot.price === "$" || spot.tags.includes("cheap");
+    }
+    if (moodFilter === "study") {
+      return spot.tags.includes("study-spot");
+    }
+    if (moodFilter === "lateNight") {
+      return spot.tags.includes("late-night");
+    }
+    if (moodFilter === "treat") {
+      return spot.tags.includes("dessert") || spot.tags.includes("treat");
+    }
+    // If none of these preset choices for filtering aren't chosen then all restaurants are shown to the user
+    return true; 
+  });
 
   return (
     <div>
       <div className="explore-header">
         <h1>Explore restaurants</h1>
         <p>
-          Browse popular campus spots and save your favorites to your Cravings
+          Browse popular spots around campus and save your favorites to your Cravings
           profile.
         </p>
-        {profile && profile.name && (
+        {userProfile && userProfile.name && (
           <p className="text-muted">
-            Showing spots and marking matches for {profile.name}
-            {profile.favoriteCuisine &&
-              ` who likes ${profile.favoriteCuisine} food.`}
+            Showing spots and highlighting matches for {userProfile.name}
+            {userProfile.favoriteCuisine &&
+              ` (likes ${userProfile.favoriteCuisine} food).`}
           </p>
         )}
       </div>
 
-      <ExploreFilterBar filter={filter} setFilter={setFilter} />
+      <ExploreFilterBar
+        moodFilter={moodFilter}
+        onMoodFilterChange={setMoodFilter}
+      />
 
       <Row xs={1} md={2} lg={3} className="g-4 mt-1">
-        {filtered.map((r) => (
-          <Col key={r.id}>
+        {filteredRestaurants.map((spot) => (
+          <Col key={spot.id}>
             <RestaurantCard
-              restaurant={r}
-              isFavorite={favoriteIds.includes(r.id)}
-              onToggle={() => onToggleFavorite(r.id)}
-              highlight={matchesProfile(r)}
+              restaurant={spot}
+              isSaved={savedCravingIds.includes(spot.id)}
+              onToggleCraving={() => onToggleCraving(spot.id)}
+              isProfileMatch={matchesProfile(spot)}
             />
           </Col>
         ))}

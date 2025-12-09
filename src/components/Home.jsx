@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { RESTAURANTS } from "../data/restaurants";
 import RestaurantCard from "./RestaurantCard";
 
+// These are the restaurants shown on the home page to give the user a preview of some restaurants based
+// on mood before entering the explore page with all the restaurants
 const CRAVINGS = {
   cheap: {
     label: "Cheap and Fast",
@@ -11,7 +13,7 @@ const CRAVINGS = {
     spots: [
       { name: "Ian's Pizza", note: "Mac and Cheese pizza legend." },
       { name: "McDonald's", note: "Reliable and fast classic." },
-      { name: "Paul’s Pel’meni", note: "Warm dumplings and comfort food." },
+      { name: "Paul's Pel'meni", note: "Warm dumplings and comfort food." },
     ],
   },
   study: {
@@ -35,7 +37,7 @@ const CRAVINGS = {
     spots: [
       { name: "Toppers", note: "Breadsticks past midnight hit different." },
       { name: "Conrad's", note: "Chill late night pub bites." },
-      { name: "Raising Cane’s", note: "Chicken fingers equal instant happiness." },
+      { name: "Raising Cane's", note: "Chicken fingers equal instant happiness." },
     ],
   },
   treat: {
@@ -49,63 +51,77 @@ const CRAVINGS = {
   },
 };
 
-// build a short list of recommended places from the profile
-function buildRecommendations(profile) {
-  if (!profile) return [];
+function buildProfileRecommendations(userProfile) {
+  if (!userProfile){ 
+    return [];
+  }
 
-  const fav = profile.favoriteCuisine
-    ? profile.favoriteCuisine.toLowerCase().trim()
+  const favCuisine = userProfile.favoriteCuisine
+    ? userProfile.favoriteCuisine.toLowerCase().trim()
     : "";
-  const budget = profile.budget;
+  const budgetPref = userProfile.budget;
 
-  let list = RESTAURANTS;
+  let options = RESTAURANTS;
 
-  if (fav) {
-    const cuisineFiltered = list.filter((r) => {
-      const nameMatch = r.name.toLowerCase().includes(fav);
-      const tagMatch = r.tags.some((t) => t.toLowerCase().includes(fav));
+  if (favCuisine) {
+    const byCuisine = options.filter((spot) => {
+      const nameMatch = spot.name.toLowerCase().includes(favCuisine);
+      const tagMatch = spot.tags.some((t) =>
+        t.toLowerCase().includes(favCuisine)
+      );
       return nameMatch || tagMatch;
     });
-    if (cuisineFiltered.length > 0) {
-      list = cuisineFiltered;
+    if (byCuisine.length > 0) {
+      options = byCuisine;
     }
   }
 
-  if (budget) {
+  // Ensures that low only shows low prices while medium and higher show their level prices and lower
+  if (budgetPref) {
     let allowedPrices;
-    if (budget === "low") allowedPrices = ["$"];
-    else if (budget === "medium") allowedPrices = ["$", "$$"];
-    else if (budget === "high") allowedPrices = ["$", "$$", "$$$"];
-    else allowedPrices = null;
+    if (budgetPref === "low"){ 
+      allowedPrices = ["$"];
+    }
+    else if (budgetPref === "medium"){
+       allowedPrices = ["$", "$$"];
+      }
+    else if (budgetPref === "high"){
+       allowedPrices = ["$", "$$", "$$$"];
+    }
+    else {
+      allowedPrices = null;
+    }
 
     if (allowedPrices) {
-      const budgetFiltered = list.filter((r) => allowedPrices.includes(r.price));
-      if (budgetFiltered.length > 0) {
-        list = budgetFiltered;
+      const byBudget = options.filter((spot) =>
+        allowedPrices.includes(spot.price)
+      );
+      if (byBudget.length > 0) {
+        options = byBudget;
       }
     }
   }
 
-  if (list.length === 0 || (!fav && !budget)) {
+  if (options.length === 0 || (!favCuisine && !budgetPref)) {
     return [];
   }
 
-  return list.slice(0, 3);
+  return options.slice(0, 3);
 }
 
-export default function Home({ favoriteIds = [], onToggleFavorite }) {
-  const [cravingKey, setCravingKey] = useState("cheap");
-  const [profile, setProfile] = useState(null);
+export default function Home({ savedCravingIds = [], onToggleCraving }) {
+  const [activeCravingKey, setActiveCravingKey] = useState("cheap");
+  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("userProfile");
     if (stored) {
-      setProfile(JSON.parse(stored));
+      setUserProfile(JSON.parse(stored));
     }
   }, []);
 
-  const craving = CRAVINGS[cravingKey];
-  const recommended = buildRecommendations(profile);
+  const activeCraving = CRAVINGS[activeCravingKey];
+  const profileRecommendations = buildProfileRecommendations(userProfile);
 
   return (
     <div>
@@ -116,11 +132,10 @@ export default function Home({ favoriteIds = [], onToggleFavorite }) {
         <h1 className="hero-title">Campus Cravings</h1>
 
         <p className="hero-subtitle">
-          {profile && profile.name ? (
+          {userProfile && userProfile.name ? (
             <>
-              Welcome {profile.name}. Here are the best places around UW Madison
-              for students who enjoy{" "}
-              {profile.favoriteCuisine || "good food"}.
+              Welcome {userProfile.name}. Here are the best places around campus for students who enjoy{" "}
+              {userProfile.favoriteCuisine || "good food"}.
             </>
           ) : (
             "Discover the best bites around UW Madison campus. Find food that matches your mood."
@@ -143,10 +158,10 @@ export default function Home({ favoriteIds = [], onToggleFavorite }) {
             {Object.entries(CRAVINGS).map(([key, value]) => (
               <Button
                 key={key}
-                variant={key === cravingKey ? "danger" : "outline-secondary"}
+                variant={key === activeCravingKey ? "danger" : "outline-secondary"}
                 size="sm"
                 className="me-2 mb-2"
-                onClick={() => setCravingKey(key)}
+                onClick={() => setActiveCravingKey(key)}
               >
                 {value.label}
               </Button>
@@ -157,11 +172,11 @@ export default function Home({ favoriteIds = [], onToggleFavorite }) {
 
       {/* craving results */}
       <section className="craving-results">
-        <h2 className="craving-heading">{craving.label}</h2>
-        <p className="craving-tagline">{craving.tagline}</p>
+        <h2 className="craving-heading">{activeCraving.label}</h2>
+        <p className="craving-tagline">{activeCraving.tagline}</p>
 
         <ul className="craving-list">
-          {craving.spots.map((spot) => (
+          {activeCraving.spots.map((spot) => (
             <li key={spot.name} className="craving-item">
               <span className="craving-spot-name">{spot.name}</span>
               <Badge bg="light" text="dark" className="ms-2">
@@ -176,7 +191,7 @@ export default function Home({ favoriteIds = [], onToggleFavorite }) {
       <section className="mt-4">
         <div className="explore-header">
           <h2 className="craving-heading">Places picked for you</h2>
-          {profile ? (
+          {userProfile ? (
             <p className="craving-tagline">
               Suggestions based on your Campus Cravings profile.
             </p>
@@ -188,25 +203,24 @@ export default function Home({ favoriteIds = [], onToggleFavorite }) {
           )}
         </div>
 
-        {profile && recommended.length > 0 && (
+        {userProfile && profileRecommendations.length > 0 && (
           <Row xs={1} md={3} className="g-4">
-            {recommended.map((r) => (
-              <Col key={r.id}>
+            {profileRecommendations.map((spot) => (
+              <Col key={spot.id}>
                 <RestaurantCard
-                  restaurant={r}
-                  isFavorite={favoriteIds.includes(r.id)}
-                  onToggle={() => onToggleFavorite?.(r.id)}
+                  restaurant={spot}
+                  isSaved={savedCravingIds.includes(spot.id)}
+                  onToggleCraving={() => onToggleCraving?.(spot.id)}
                 />
               </Col>
             ))}
           </Row>
         )}
 
-        {profile && recommended.length === 0 && (
+        {userProfile && profileRecommendations.length === 0 && (
           <p className="craving-tagline">
-            We did not find clear matches yet. Try adding your favorite cuisine
-            or budget on your{" "}
-            <Link to="/profile">profile page</Link>.
+            We didn't find clear matches yet. Try adding your favorite cuisine
+            or budget on your <Link to="/profile">Profile Page</Link>.
           </p>
         )}
       </section>

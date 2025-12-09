@@ -1,17 +1,22 @@
-export default function ExploreFilterBar({ filter, setFilter }) {
+export default function ExploreFilterBar({ moodFilter, onMoodFilterChange }) {
   return (
     <div className="mb-3">
       <label htmlFor="filter-select" className="form-label">
-        Filter by mood
+        Filter By Cravings!
       </label>
       <select
         id="filter-select"
         className="form-select"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
+        value={moodFilter}
+        onChange={(e) => onMoodFilterChange(e.target.value)}
+        // Mood filter is used for this filter bar to only show user restaurants
+        // they would prefer at the moment
       >
         <option value="all">All spots</option>
-        <option value="lateNight">Late night</option>
+        <option value="cheap">Cheap &amp; Fast</option>
+        <option value="study">Study Snacks</option>
+        <option value="lateNight">Late Night</option>
+        <option value="treat">Treat Yourself</option>
       </select>
     </div>
   );
