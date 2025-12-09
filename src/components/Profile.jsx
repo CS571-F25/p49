@@ -12,7 +12,6 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
   });
   const [hasSaved, setHasSaved] = useState(false);
 
-  // Load profile from localStorage on first render
   useEffect(() => {
     const stored = localStorage.getItem("userProfile");
     if (stored) {
@@ -41,7 +40,6 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
     <div>
       <h1>Your Campus Cravings profile</h1>
 
-      {/* Create or edit profile section */}
       <section className="mb-4">
         <h2 className="h4">Create or update your profile</h2>
         <p className="text-muted">
@@ -67,7 +65,7 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
               name="favoriteCuisine"
               value={profile.favoriteCuisine}
               onChange={handleChange}
-              placeholder="Example Thai, pizza, coffee and pastries"
+              placeholder="For example Thai, pizza, coffee and pastries"
             />
           </Form.Group>
 
@@ -93,7 +91,7 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
               name="bio"
               value={profile.bio}
               onChange={handleChange}
-              placeholder="Example Food focused student at UW Madison who loves late night snacks and study cafes"
+              placeholder="For example food focused student at UW Madison who loves late night snacks and study cafes"
             />
           </Form.Group>
 
@@ -125,7 +123,6 @@ export default function Profile({ favoriteIds, onToggleFavorite }) {
         )}
       </section>
 
-      {/* Saved spots section */}
       <section>
         <h2 className="h4">Your saved spots</h2>
         {favorites.length === 0 ? (

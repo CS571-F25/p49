@@ -1,6 +1,11 @@
 import { Card, Badge, Button } from "react-bootstrap";
 
-export default function RestaurantCard({ restaurant, isFavorite, onToggle }) {
+export default function RestaurantCard({
+  restaurant,
+  isFavorite,
+  onToggle,
+  highlight = false,
+}) {
   return (
     <Card className="shadow-sm h-100">
       <Card.Img
@@ -13,6 +18,13 @@ export default function RestaurantCard({ restaurant, isFavorite, onToggle }) {
           {restaurant.name}{" "}
           <small className="text-muted">{restaurant.price}</small>
         </Card.Title>
+
+        {highlight && (
+          <Badge bg="success" className="mb-2">
+            Matches your profile
+          </Badge>
+        )}
+
         <Card.Text>{restaurant.description}</Card.Text>
         <div className="mb-2">
           {restaurant.tags.map((tag) => (

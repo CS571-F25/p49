@@ -11,7 +11,7 @@ export default function ExploreFilterBar({ filter, setFilter }) {
         onChange={(e) => setFilter(e.target.value)}
       >
         <option value="all">All spots</option>
-        <option value="late-night">Late-night</option>
+        <option value="lateNight">Late night</option>
       </select>
     </div>
   );
